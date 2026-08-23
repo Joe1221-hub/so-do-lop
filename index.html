@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sơ đồ lớp</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="identityModal" class="modal">
+  <div class="modal-box" id="step1Box">
+    <h2>Bạn là ai?</h2>
+    <select id="nameSelect"></select>
+    <button id="confirmIdentityBtn">Tiếp tục</button>
+  </div>
+  <div class="modal-box" id="step2Box" style="display:none;">
+    <h2 id="pinTitle">Nhập mã PIN của bạn</h2>
+    <input type="password" id="pinInput" maxlength="6" placeholder="4-6 số" inputmode="numeric">
+    <button id="confirmPinBtn">Vào lớp</button>
+    <div id="pinError" style="color:#c1554a;font-size:.8rem;margin-top:6px;"></div>
+  </div>
+</div>
+
+<div class="app-shell" id="appShell" style="display:none;">
+  <header class="topbar">
+  <h1>Lớp mình</h1>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="history-btn" id="historyBtn">🕓 Lịch sử</button>
+    <div class="avatar" id="avatarBtn"><span id="avatarEmoji">👤</span>
+  <div class="avatar-menu" id="avatarMenu">
+        <div id="meName" class="avatar-menu-name"></div>
+        <button id="editProfileBtn">Sửa hồ sơ</button>
+        <button id="updateNoteBtn">Cập nhật note</button>
+        <button id="pinBtn">Nhập mã cán bộ</button>
+        <button id="logoutBtn">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="seating">Xếp chỗ</button>
+    <button class="tab-btn" data-tab="groups">Chia nhóm</button>
+    <button class="tab-btn" data-tab="feed">Feed</button>
+    <button class="tab-btn" data-tab="hof">Hall of Fame</button>
+  </nav>
+
+  <main>
+    <section id="tab-seating" class="tab-panel active">
+      <div class="status" id="status">Đang tải…</div>
+      <div class="actions" id="editActions" style="display:none;">
+        <button id="pushBtn">Cập nhật</button>
+        <button id="shuffleBtn">🎲 Xếp ngẫu nhiên</button>
+        <button id="callBtn">📢 Gọi ngẫu nhiên</button>
+        <button id="resetBtn">Xếp lại từ đầu</button>
+      </div>
+      <div class="call-banner" id="callBanner"></div>
+      <div class="roster-section">
+        <h2>Học sinh chưa xếp chỗ</h2>
+        <div class="roster-list" id="rosterList"></div>
+        <div class="add-row" id="addRow" style="display:none;">
+          <input type="text" id="nameInput" placeholder="Tên học sinh…">
+          <button id="addBtn">Thêm</button>
+        </div>
+      </div>
+      <div class="classroom">
+        <div class="top-bar">
+          <div class="door">🚪 Cửa vào</div>
+          <div class="teacher-desk">🧑‍🏫 Bàn giáo viên</div>
+        </div>
+        <div class="zones" id="zones"></div>
+      </div>
+    </section>
+
+    <section id="tab-groups" class="tab-panel">
+  <div class="actions" id="groupActions" style="display:none;">
+    <input type="number" id="groupCountInput" min="2" max="20" placeholder="Số nhóm" style="width:100px;">
+    <button id="makeGroupsBtn">🎲 Chia nhóm ngẫu nhiên</button>
+  </div>
+  <div id="groupsResult" class="groups-grid"></div>
+</section>
+    <section id="tab-feed" class="tab-panel">
+  <div class="feed-composer">
+    <textarea id="feedCaption" placeholder="Bạn đang nghĩ gì?..." rows="2"></textarea>
+    <div class="feed-composer-row">
+     <label class="feed-upload-btn">
+  📷 Ảnh/Video
+  <input type="file" id="feedImageInput" accept="image/*,video/*" multiple style="display:none;">
+</label>
+<span id="feedImageName" class="feed-image-name"></span>
+      <button id="postFeedBtn">Đăng</button>
+    </div>
+  </div>
+  <div id="feedList" class="feed-list"></div>
+</section>
+    <section id="tab-hof" class="tab-panel">
+      <p class="soon">Hall of Fame — làm sau cùng.</p>
+    </section>
+  </main>
+</div>
+
+<div class="history-panel" id="historyPanel">
+  <div class="history-header">
+    <h3>Lịch sử hoạt động</h3>
+    <button id="closeHistoryBtn">✕</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<div class="modal" id="profileEditModal" style="display:none;">
+  <div class="modal-box profile-box">
+    <h2>Sửa hồ sơ của bạn</h2>
+
+    <div class="avatar-edit-row">
+  <div class="avatar-preview" id="avatarPreview">👤</div>
+  <label class="feed-upload-btn">
+    Đổi avatar
+    <input type="file" id="pfAvatarInput" accept="image/*" style="display:none;">
+  </label>
+</div>
+
+    <label>Họ và tên
+      <input type="text" id="pfFullName">
+      <span class="vis-toggle"><input type="checkbox" id="pfFullNameVis"> Công khai</span>
+    </label>
+    <label>Ngày sinh
+      <input type="date" id="pfDob">
+      <span class="vis-toggle"><input type="checkbox" id="pfDobVis"> Công khai</span>
+    </label>
+    <label>Sở thích
+      <input type="text" id="pfHobbies">
+      <span class="vis-toggle"><input type="checkbox" id="pfHobbiesVis"> Công khai</span>
+    </label>
+    <label>Link mạng xã hội
+      <input type="text" id="pfSocial" placeholder="https://...">
+      <span class="vis-toggle"><input type="checkbox" id="pfSocialVis"> Công khai</span>
+    </label>
+    <label>Mục tiêu
+      <input type="text" id="pfGoals">
+      <span class="vis-toggle"><input type="checkbox" id="pfGoalsVis"> Công khai</span>
+    </label>
+
+    <div class="modal-actions">
+      <button id="saveProfileBtn">Lưu</button>
+      <button id="closeProfileEditBtn" class="btn-secondary">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="profileEditModal" style="display:none;">
+  <div class="modal-box profile-box">
+    <h2>Sửa hồ sơ của bạn</h2>
+
+    <label>Họ và tên
+      <input type="text" id="pfFullName">
+      <span class="vis-toggle"><input type="checkbox" id="pfFullNameVis"> Công khai</span>
+    </label>
+    <label>Ngày sinh
+      <input type="date" id="pfDob">
+      <span class="vis-toggle"><input type="checkbox" id="pfDobVis"> Công khai</span>
+    </label>
+    <label>Sở thích
+      <input type="text" id="pfHobbies">
+      <span class="vis-toggle"><input type="checkbox" id="pfHobbiesVis"> Công khai</span>
+    </label>
+    <label>Link mạng xã hội
+      <input type="text" id="pfSocial" placeholder="https://...">
+      <span class="vis-toggle"><input type="checkbox" id="pfSocialVis"> Công khai</span>
+    </label>
+    <label>Mục tiêu
+      <input type="text" id="pfGoals">
+      <span class="vis-toggle"><input type="checkbox" id="pfGoalsVis"> Công khai</span>
+    </label>
+
+    <div class="modal-actions">
+      <button id="saveProfileBtn">Lưu</button>
+      <button id="closeProfileEditBtn" class="btn-secondary">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="profileEditModal" style="display:none;">
+  <div class="modal-box profile-box">
+    <h2>Sửa hồ sơ của bạn</h2>
+
+    <label>Họ và tên
+      <input type="text" id="pfFullName">
+      <span class="vis-toggle"><input type="checkbox" id="pfFullNameVis"> Công khai</span>
+    </label>
+    <label>Ngày sinh
+      <input type="date" id="pfDob">
+      <span class="vis-toggle"><input type="checkbox" id="pfDobVis"> Công khai</span>
+    </label>
+    <label>Sở thích
+      <input type="text" id="pfHobbies">
+      <span class="vis-toggle"><input type="checkbox" id="pfHobbiesVis"> Công khai</span>
+    </label>
+    <label>Link mạng xã hội
+      <input type="text" id="pfSocial" placeholder="https://...">
+      <span class="vis-toggle"><input type="checkbox" id="pfSocialVis"> Công khai</span>
+    </label>
+    <label>Mục tiêu
+      <input type="text" id="pfGoals">
+      <span class="vis-toggle"><input type="checkbox" id="pfGoalsVis"> Công khai</span>
+    </label>
+
+    <div class="modal-actions">
+      <button id="saveProfileBtn">Lưu</button>
+      <button id="closeProfileEditBtn" class="btn-secondary">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="profileViewModal" style="display:none;">
+  <div class="modal-box profile-box">
+    <h2 id="pvName"></h2>
+    <div id="pvFields"></div>
+    <button id="closeProfileViewBtn" class="btn-secondary">Đóng</button>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" style="display:none;">
+  <img id="lightboxImg" src="">
+  <button id="closeLightboxBtn">✕</button>
+</div>
+
+<div class="mini-menu" id="nameMenu" style="display:none;">
+  <button id="menuViewProfile">👤 Xem hồ sơ</button>
+  <button id="menuViewAvatar">🖼️ Xem avatar</button>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
+<script src="supabase-client.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
